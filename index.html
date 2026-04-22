@@ -48,16 +48,17 @@ body{
 @media(min-width:640px){.card,.card-dark{border-radius:14px}}
 
 /* ===== ДАШБОРД ===== */
-.dash-top{display:block;margin-bottom:5px}
-.bal-label{font-size:8px;font-weight:700;color:rgba(255,255,255,.55);letter-spacing:.8px;text-transform:uppercase}
-.bal-total{font-size:clamp(14px,4.5vw,20px);font-weight:800;color:#fff;margin:2px 0 1px;line-height:1.05;letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dash-top{display:block;margin-bottom:6px}
+.bal-label{font-size:10px;font-weight:700;color:rgba(255,255,255,.55);letter-spacing:1px;text-transform:uppercase}
+/* Баланс +30% */
+.bal-total{font-size:clamp(18px,5.9vw,26px);font-weight:800;color:#fff;margin:3px 0 1px;line-height:1.05;letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bal-total.neg{color:#ff453a}
-.bal-updated{font-size:8px;color:rgba(255,255,255,.4);margin-top:1px}
+.bal-updated{font-size:9px;color:rgba(255,255,255,.4);margin-top:1px}
 
-/* Кубышка в 2 раза мельче */
-.kubushka{display:flex;align-items:center;justify-content:space-between;gap:6px;background:linear-gradient(135deg,#ffd700,#ffaa00,#ffd700);background-size:200% 100%;animation:shimmer 3s linear infinite;border-radius:7px;padding:5px 8px;margin-top:5px;overflow:hidden}
-.kb-label{font-size:7px;font-weight:700;color:rgba(0,0,0,.5);letter-spacing:.5px;text-transform:uppercase;flex-shrink:0}
-.kb-val{font-size:clamp(8px,2.5vw,10px);font-weight:800;color:#1c1c1e;white-space:nowrap;letter-spacing:-.1px;overflow:hidden;text-overflow:ellipsis}
+/* Кубышка +20% */
+.kubushka{display:flex;align-items:center;justify-content:space-between;gap:7px;background:linear-gradient(135deg,#ffd700,#ffaa00,#ffd700);background-size:200% 100%;animation:shimmer 3s linear infinite;border-radius:8px;padding:6px 10px;margin-top:6px;overflow:hidden}
+.kb-label{font-size:9px;font-weight:700;color:rgba(0,0,0,.5);letter-spacing:.6px;text-transform:uppercase;flex-shrink:0}
+.kb-val{font-size:clamp(10px,3vw,12px);font-weight:800;color:#1c1c1e;white-space:nowrap;letter-spacing:-.1px;overflow:hidden;text-overflow:ellipsis}
 .kubushka-zero{opacity:.35;animation:none;background:#555}
 .kubushka-zero .kb-label,.kubushka-zero .kb-val{color:rgba(255,255,255,.5)}
 
@@ -75,24 +76,27 @@ body{
 .tag-exp{background:rgba(255,59,48,.22);color:#ff453a}
 .tag-sub{font-size:6px;font-weight:500;opacity:.7;display:block;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 
-.dash-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-top:7px}
-.dash-btn{padding:7px 2px;font-size:8px;font-weight:700;border:none;border-radius:6px;cursor:pointer;font-family:inherit;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* Кнопки дашборда +50% */
+.dash-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:10px}
+.dash-btn{padding:11px 3px;font-size:12px;font-weight:700;border:none;border-radius:9px;cursor:pointer;font-family:inherit;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dash-btn:active{opacity:.7;transform:scale(.97)}
 .btn-summary{background:rgba(255,255,255,.14);color:#fff}
 .btn-balance{background:rgba(255,215,0,.28);color:#ffd700}
 .btn-refs{background:rgba(175,82,222,.28);color:#d4a5ff}
 
 /* ===== ФОРМА ===== */
-.form-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:6px}
-.who-tag{font-size:10px;font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.date-input{font-size:9px;font-weight:500;color:#8e8e93;border:none;background:transparent;text-align:right;font-family:inherit;-webkit-appearance:none;padding:2px 0;flex-shrink:0}
+.form-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:6px}
+.who-tag{font-size:11px;font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* Дата +30% */
+.date-input{font-size:12px;font-weight:500;color:#8e8e93;border:none;background:transparent;text-align:right;font-family:inherit;-webkit-appearance:none;padding:3px 0;flex-shrink:0}
 
-.status-row{display:flex;gap:10px;margin-bottom:8px;flex-wrap:wrap}
-.chk{display:flex;align-items:center;gap:5px;cursor:pointer}
-.chk input[type="checkbox"]{width:14px;height:14px;border-radius:4px;border:1.5px solid #d1d1d6;background:#fff;-webkit-appearance:none;appearance:none;cursor:pointer;position:relative;flex-shrink:0;padding:0}
+/* Чекбоксы +20% */
+.status-row{display:flex;gap:12px;margin-bottom:10px;flex-wrap:wrap}
+.chk{display:flex;align-items:center;gap:6px;cursor:pointer}
+.chk input[type="checkbox"]{width:17px;height:17px;border-radius:5px;border:1.5px solid #d1d1d6;background:#fff;-webkit-appearance:none;appearance:none;cursor:pointer;position:relative;flex-shrink:0;padding:0}
 .chk input:checked{background:#ff9500;border-color:#ff9500}
-.chk input:checked::after{content:'';position:absolute;top:1px;left:4px;width:3px;height:6px;border:solid #fff;border-width:0 1.5px 1.5px 0;transform:rotate(45deg)}
-.chk span{font-size:9px;font-weight:600;color:#48484a}
+.chk input:checked::after{content:'';position:absolute;top:2px;left:5px;width:4px;height:7px;border:solid #fff;border-width:0 1.8px 1.8px 0;transform:rotate(45deg)}
+.chk span{font-size:11px;font-weight:600;color:#48484a}
 
 /* Доход/Расход в 1.5 раза мельче */
 .type-row{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:10px}
@@ -122,26 +126,27 @@ body{
 .sum-input::placeholder{color:#d1d1d6}
 .sum-cur{font-size:7px;color:#8e8e93;font-weight:600;margin-top:3px}
 
-/* Способ оплаты: 35% мельче */
-.pay-label{font-size:7px;font-weight:700;color:#8e8e93;margin-bottom:4px;text-transform:uppercase;letter-spacing:.3px}
-.pay-row{display:grid;grid-template-columns:repeat(2,1fr);gap:4px;margin-bottom:9px}
-.pay-btn{display:flex;align-items:center;justify-content:center;gap:4px;padding:7px 4px;border-radius:6px;cursor:pointer;border:1px solid #e5e5ea;background:#fff;font-family:inherit;overflow:hidden}
+/* Способ оплаты +50% */
+.pay-label{font-size:9px;font-weight:700;color:#8e8e93;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px}
+.pay-row{display:grid;grid-template-columns:repeat(2,1fr);gap:5px;margin-bottom:11px}
+.pay-btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:11px 6px;border-radius:8px;cursor:pointer;border:1.5px solid #e5e5ea;background:#fff;font-family:inherit;overflow:hidden}
 .pay-btn:active{transform:scale(.96)}
-.pay-btn .pay-icon{font-size:11px;line-height:1;flex-shrink:0}
-.pay-btn .pay-text{font-size:7px;font-weight:700;color:#1c1c1e;line-height:1.2;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.pay-btn.on{border-color:#007aff;background:#eff6ff;box-shadow:0 1px 5px rgba(0,122,255,.15)}
+.pay-btn .pay-icon{font-size:17px;line-height:1;flex-shrink:0}
+.pay-btn .pay-text{font-size:11px;font-weight:700;color:#1c1c1e;line-height:1.2;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pay-btn.on{border-color:#007aff;background:#eff6ff;box-shadow:0 2px 7px rgba(0,122,255,.17)}
 .pay-btn.on .pay-text{color:#007aff}
 
-/* Контур: 40% мельче */
-.cnt-row{display:grid;grid-template-columns:1fr;gap:4px;margin-bottom:9px}
-.cnt-btn{display:flex;align-items:center;gap:6px;padding:7px 8px;border-radius:6px;cursor:pointer;border:1px solid #e5e5ea;background:#fff;font-family:inherit;text-align:left;overflow:hidden}
+/* Контур +50% */
+.cnt-row{display:grid;grid-template-columns:1fr;gap:5px;margin-bottom:11px}
+.cnt-btn{display:flex;align-items:center;gap:9px;padding:11px 12px;border-radius:8px;cursor:pointer;border:1.5px solid #e5e5ea;background:#fff;font-family:inherit;text-align:left;overflow:hidden}
 .cnt-btn:active{transform:scale(.98)}
-.cnt-btn .cnt-icon{font-size:12px;line-height:1;flex-shrink:0}
-.cnt-btn .cnt-text{font-size:7px;font-weight:600;color:#1c1c1e;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.cnt-btn.on{border-color:#007aff;background:#eff6ff;box-shadow:0 1px 5px rgba(0,122,255,.15)}
+.cnt-btn .cnt-icon{font-size:18px;line-height:1;flex-shrink:0}
+.cnt-btn .cnt-text{font-size:11px;font-weight:600;color:#1c1c1e;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cnt-btn.on{border-color:#007aff;background:#eff6ff;box-shadow:0 2px 7px rgba(0,122,255,.17)}
 .cnt-btn.on .cnt-text{color:#007aff}
 
-.btn-submit{width:100%;padding:10px;margin-top:4px;font-size:10px;font-weight:700;background:#007aff;color:#fff;border:none;border-radius:7px;cursor:pointer;font-family:inherit;box-shadow:0 2px 8px rgba(0,122,255,.22)}
+/* Кнопка Добавить — толще на 30% */
+.btn-submit{width:100%;padding:16px;margin-top:6px;font-size:13px;font-weight:800;background:#007aff;color:#fff;border:none;border-radius:9px;cursor:pointer;font-family:inherit;box-shadow:0 3px 11px rgba(0,122,255,.25)}
 .btn-submit:disabled{opacity:.4}
 .btn-submit:active{transform:scale(.97)}
 .btn-submit.success{background:#34c759}
@@ -322,16 +327,18 @@ body{
     </div>
     <div class="field"><div class="field-label">Объект / поток</div><select id="поток"><option value="">Выбрать</option></select></div>
     <div class="field"><div class="field-label">Статья</div><select id="статья"><option value="">Выбрать</option></select></div>
+    <!-- Сумма наверху (перед Контрагентом) -->
+    <div class="sum-block">
+      <input class="sum-input" id="сумма" type="text" inputmode="decimal" placeholder="0" oninput="validateSum(this)">
+      <div class="sum-cur">руб. (копейки через запятую)</div>
+    </div>
+    <!-- Контрагент под суммой -->
     <div class="field">
       <div class="field-label">Контрагент</div>
       <div class="ct-wrap">
         <input id="контрагент" type="text" placeholder="начни вводить..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" oninput="ctFilter(this.value)" onfocus="ctFilter(this.value)" onblur="setTimeout(ctHide,250)">
         <div class="ct-drop" id="ctDrop"></div>
       </div>
-    </div>
-    <div class="sum-block">
-      <input class="sum-input" id="сумма" type="text" inputmode="decimal" placeholder="0" oninput="validateSum(this)">
-      <div class="sum-cur">руб. (копейки через запятую)</div>
     </div>
     <div class="pay-label">Способ оплаты</div>
     <div class="pay-row" id="payRow"></div>
@@ -402,7 +409,7 @@ body{
    КОНФИГ: впиши сюда URL GAS Web App (заканчивается на /exec)
    Получить: GAS → Deploy → New deployment → URL
    ============================================ */
-var GAS_URL = 'https://script.google.com/macros/s/AKfycbxZ1MnyxBB5RV1szrO1qW5a4PW6VBQAZh0-Cm-4O-bdiCA17lRX1DlxOANnesm2x--x/exec';
+var GAS_URL = 'ВСТАВЬ_СЮДА_URL_GAS_ЗАКАНЧИВАЮЩИЙСЯ_НА_EXEC';
 
 /* Кто зашёл — определяется по параметру ?who=maxim / ?who=arina в URL */
 var _urlParams = new URLSearchParams(location.search);
