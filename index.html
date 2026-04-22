@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+
+<!-- ===== PWA — полноэкранный режим на Home Screen iPhone ===== -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ДДС">
+<meta name="theme-color" content="#1c1c2e">
+<meta name="format-detection" content="telephone=no">
+
+<!-- Иконка для Home Screen (фиолетовая с символом ₽) -->
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxODAiIGhlaWdodD0iMTgwIiB2aWV3Qm94PSIwIDAgMTgwIDE4MCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzY2N2VlYSIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzc2NGJhMiIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHdpZHRoPSIxODAiIGhlaWdodD0iMTgwIiByeD0iNDAiIGZpbGw9InVybCgjZykiLz48dGV4dCB4PSI5MCIgeT0iMTI4IiBmb250LWZhbWlseT0iLWFwcGxlLXN5c3RlbSxzYW5zLXNlcmlmIiBmb250LXNpemU9IjEyMCIgZm9udC13ZWlnaHQ9IjkwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZiI+4oK9PC90ZXh0Pjwvc3ZnPg==">
+
+<title>ДДС</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent;min-width:0}
+html{width:100%;overflow-x:hidden;margin:0;padding:0}
+body{width:100%;min-height:100vh;overflow-x:hidden;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;background:#f2f2f7;color:#1c1c1e;-webkit-font-smoothing:antialiased;font-size:18px}
+
+/* ===== PWA режим: учитываем чёлку и Dynamic Island ===== */
+body{
+  padding-top:env(safe-area-inset-top);
+  padding-bottom:env(safe-area-inset-bottom);
+  padding-left:env(safe-area-inset-left);
+  padding-right:env(safe-area-inset-right);
+}
+
+/* ===== Контейнер: полностью впритык к краям экрана ===== */
+.wrap{width:100%;max-width:100%;margin:0;padding:0 0 24px}
+@media(min-width:640px){.wrap{max-width:540px;margin:0 auto;padding:16px 12px 24px}}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes popIn{0%{transform:scale(.7);opacity:0}60%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes confettiFall{0%{opacity:1;transform:translateY(0) rotate(0)}100%{opacity:0;transform:translateY(400px) rotate(720deg)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.anim-pulse{animation:pulse .4s ease}
+.anim-shake{animation:shake .4s ease}
+
+/* ===== КАРТОЧКИ — впритык к краям, без border-radius по бокам ===== */
+.card{background:#fff;padding:24px 18px;margin-bottom:10px;box-shadow:0 2px 10px rgba(0,0,0,.06);animation:fadeUp .4s ease both;overflow:hidden}
+.card-dark{background:linear-gradient(145deg,#1c1c2e,#2d1b4e);padding:24px 18px;margin-bottom:10px;color:#fff;animation:fadeUp .4s ease both;overflow:hidden}
+/* Радиус только на десктопе когда центрируется */
+@media(min-width:640px){
+  .card,.card-dark{border-radius:22px}
+}
+
+/* ===== ДАШБОРД ===== */
+.dash-top{display:block;margin-bottom:12px}
+.bal-label{font-size:15px;font-weight:700;color:rgba(255,255,255,.55);letter-spacing:1.6px;text-transform:uppercase}
+.bal-total{font-size:clamp(42px,13vw,62px);font-weight:900;color:#fff;margin:6px 0 4px;line-height:1;letter-spacing:-1.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bal-total.neg{color:#ff453a}
+.bal-updated{font-size:14px;color:rgba(255,255,255,.4);margin-top:2px}
+
+.kubushka{display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(135deg,#ffd700,#ffaa00,#ffd700);background-size:200% 100%;animation:shimmer 3s linear infinite;border-radius:16px;padding:16px 18px;margin-top:16px;overflow:hidden}
+.kb-label{font-size:13px;font-weight:800;color:rgba(0,0,0,.5);letter-spacing:1.2px;text-transform:uppercase;flex-shrink:0}
+.kb-val{font-size:clamp(22px,7vw,32px);font-weight:900;color:#1c1c1e;white-space:nowrap;letter-spacing:-.5px;overflow:hidden;text-overflow:ellipsis}
+.kubushka-zero{opacity:.35;animation:none;background:#555}
+.kubushka-zero .kb-label,.kubushka-zero .kb-val{color:rgba(255,255,255,.5)}
+
+.wallets{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0 0}
+.w-item{background:rgba(255,255,255,.1);border-radius:14px;padding:14px 14px;overflow:hidden}
+.w-name{font-size:13px;color:rgba(255,255,255,.55);font-weight:600;margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.w-amt{font-size:clamp(18px,5.5vw,26px);font-weight:800;color:#fff;letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.w-amt.neg{color:#ff453a}
+
+.tags-title{font-size:13px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:1.2px;text-transform:uppercase;margin:18px 0 10px}
+.tags-cloud{display:flex;flex-wrap:wrap;gap:7px}
+.tag{display:inline-block;padding:9px 13px;border-radius:11px;font-size:15px;font-weight:800;line-height:1.2;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.tag-inc{background:rgba(52,199,89,.22);color:#30d158}
+.tag-exp{background:rgba(255,59,48,.22);color:#ff453a}
+.tag-sub{font-size:12px;font-weight:500;opacity:.75;display:block;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+
+.dash-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:18px}
+.dash-btn{padding:18px 6px;font-size:16px;font-weight:800;border:none;border-radius:14px;cursor:pointer;font-family:inherit;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dash-btn:active{opacity:.7;transform:scale(.97)}
+.btn-summary{background:rgba(255,255,255,.14);color:#fff}
+.btn-balance{background:rgba(255,215,0,.28);color:#ffd700}
+.btn-refs{background:rgba(175,82,222,.28);color:#d4a5ff}
+
+/* ===== ФОРМА ===== */
+.form-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;gap:12px}
+.who-tag{font-size:22px;font-weight:800;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.date-input{font-size:17px;font-weight:500;color:#8e8e93;border:none;background:transparent;text-align:right;font-family:inherit;-webkit-appearance:none;padding:4px 0;flex-shrink:0}
+
+.status-row{display:flex;gap:24px;margin-bottom:20px;flex-wrap:wrap}
+.chk{display:flex;align-items:center;gap:12px;cursor:pointer}
+.chk input[type="checkbox"]{width:30px;height:30px;border-radius:9px;border:2.5px solid #d1d1d6;background:#fff;-webkit-appearance:none;appearance:none;cursor:pointer;position:relative;flex-shrink:0;padding:0}
+.chk input:checked{background:#ff9500;border-color:#ff9500}
+.chk input:checked::after{content:'';position:absolute;top:5px;left:10px;width:7px;height:14px;border:solid #fff;border-width:0 3px 3px 0;transform:rotate(45deg)}
+.chk span{font-size:18px;font-weight:600;color:#48484a}
+
+.type-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:22px}
+.type-btn{padding:clamp(26px,8vw,36px) 10px;font-size:clamp(24px,8vw,34px);font-weight:900;text-align:center;border-radius:18px;cursor:pointer;border:2.5px solid #e5e5ea;background:#fff;color:#8e8e93;font-family:inherit;letter-spacing:-.3px}
+.type-btn:active{transform:scale(.96)}
+.type-btn.on-income{background:#34c759;color:#fff;border-color:#34c759;box-shadow:0 6px 24px rgba(52,199,89,.4)}
+.type-btn.on-expense{background:#ff3b30;color:#fff;border-color:#ff3b30;box-shadow:0 6px 24px rgba(255,59,48,.4)}
+
+.field{margin-bottom:20px}
+.field-label{font-size:15px;font-weight:700;color:#8e8e93;margin-bottom:10px;text-transform:uppercase;letter-spacing:.7px}
+.field select,.field input[type="text"],.field input[type="tel"],.field textarea{display:block;width:100%;padding:19px 16px;font-size:21px;font-weight:500;border:2px solid #e5e5ea;border-radius:14px;background:#fff;color:#1c1c1e;-webkit-appearance:none;appearance:none;font-family:inherit;outline:none}
+.field select{padding-right:48px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='10'%3E%3Cpath fill='%238e8e93' d='M0 0l8 10 8-10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center;background-size:16px}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:#007aff}
+.field textarea{resize:none;height:80px}
+
+.ct-wrap{position:relative}
+.ct-drop{display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.22);z-index:500;max-height:320px;overflow-y:auto}
+.ct-item{padding:17px 18px;font-size:20px;color:#1c1c1e;border-bottom:1px solid rgba(0,0,0,.05);cursor:pointer}
+.ct-item:last-child{border-bottom:none}
+.ct-item:active{background:rgba(0,122,255,.08)}
+
+.sum-block{background:#f9f9f9;border-radius:20px;padding:28px 14px;text-align:center;margin-bottom:22px;border:2.5px solid #e5e5ea;overflow:hidden}
+.sum-block:focus-within{border-color:#007aff;background:#fff}
+.sum-input{display:block;width:100%;border:none;background:transparent;text-align:center;font-size:clamp(46px,15vw,72px);font-weight:900;padding:0;font-family:inherit;outline:none;color:#1c1c1e;letter-spacing:-1.5px;line-height:1}
+.sum-input::placeholder{color:#d1d1d6}
+.sum-cur{font-size:15px;color:#8e8e93;font-weight:600;margin-top:10px}
+
+.pay-label{font-size:15px;font-weight:700;color:#8e8e93;margin-bottom:12px;text-transform:uppercase;letter-spacing:.7px}
+.pay-row{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:22px}
+.pay-btn{display:flex;align-items:center;justify-content:center;gap:10px;padding:20px 8px;border-radius:14px;cursor:pointer;border:2.5px solid #e5e5ea;background:#fff;font-family:inherit;overflow:hidden}
+.pay-btn:active{transform:scale(.96)}
+.pay-btn .pay-icon{font-size:32px;line-height:1;flex-shrink:0}
+.pay-btn .pay-text{font-size:17px;font-weight:700;color:#1c1c1e;line-height:1.2;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pay-btn.on{border-color:#007aff;background:#eff6ff;box-shadow:0 3px 16px rgba(0,122,255,.2)}
+.pay-btn.on .pay-text{color:#007aff}
+
+.cnt-row{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:22px}
+.cnt-btn{display:flex;align-items:center;gap:14px;padding:20px 18px;border-radius:14px;cursor:pointer;border:2.5px solid #e5e5ea;background:#fff;font-family:inherit;text-align:left;overflow:hidden}
+.cnt-btn:active{transform:scale(.98)}
+.cnt-btn .cnt-icon{font-size:34px;line-height:1;flex-shrink:0}
+.cnt-btn .cnt-text{font-size:21px;font-weight:700;color:#1c1c1e;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cnt-btn.on{border-color:#007aff;background:#eff6ff;box-shadow:0 3px 16px rgba(0,122,255,.2)}
+.cnt-btn.on .cnt-text{color:#007aff}
+
+.btn-submit{width:100%;padding:26px;margin-top:10px;font-size:24px;font-weight:900;background:#007aff;color:#fff;border:none;border-radius:18px;cursor:pointer;font-family:inherit;box-shadow:0 6px 24px rgba(0,122,255,.38);letter-spacing:.3px}
+.btn-submit:disabled{opacity:.4}
+.btn-submit:active{transform:scale(.97)}
+.btn-submit.success{background:#34c759}
+.btn-submit.error{background:#ff3b30}
+
+/* ===== PWA: установка на Home Screen ===== */
+.install-prompt{
+  background:linear-gradient(135deg,#667eea,#764ba2);
+  color:#fff;padding:16px 18px;margin:0 0 10px;
+  font-size:14px;line-height:1.4;
+  position:relative;
+}
+.install-prompt b{font-size:15px;display:block;margin-bottom:6px}
+.install-prompt-steps{font-size:13px;opacity:.9;margin-top:8px}
+.install-prompt-steps span{display:inline-block;background:rgba(255,255,255,.15);padding:2px 8px;border-radius:6px;margin:2px 2px 2px 0;font-weight:600}
+.install-close{
+  position:absolute;top:8px;right:8px;
+  background:rgba(255,255,255,.2);border:none;color:#fff;
+  width:28px;height:28px;border-radius:50%;font-size:16px;
+  cursor:pointer;font-family:inherit;line-height:1;
+}
+
+/* Прячем баннер если открыто в standalone режиме (с Home Screen) */
+@media all and (display-mode:standalone){
+  .install-prompt{display:none!important}
+}
+/* iOS Safari standalone indicator */
+@supports(-webkit-touch-callout:none){
+  .standalone-only{display:none}
+}
+
+.notice{border-radius:14px;padding:16px 18px;margin-bottom:16px;font-weight:600;font-size:17px;animation:fadeUp .3s ease both}
+.notice.ok{background:#d1f5d3;color:#1a5c35;border:1px solid #a3e6a8}
+.notice.err{background:#ffe0e0;color:#7a1010;border:1px solid #ffb3b3}
+
+/* Оверлеи */
+.overlay{display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;overflow-y:auto;background:#f2f2f7;z-index:100}
+.ov-header{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.ov-back{background:#e5e5ea;border:none;border-radius:14px;padding:14px 20px;color:#1c1c1e;font-size:18px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0}
+.ov-back:active{opacity:.7}
+.ov-title{font-size:24px;font-weight:800;color:#1c1c1e;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.kb-summary{background:linear-gradient(135deg,#ffd700,#ffaa00,#ffd700);background-size:200% 100%;animation:shimmer 3s linear infinite;border-radius:18px;padding:22px;margin-bottom:14px;text-align:center}
+.kb-summary-label{font-size:15px;font-weight:700;color:rgba(0,0,0,.45);text-transform:uppercase;letter-spacing:1px}
+.kb-summary-val{font-size:36px;font-weight:900;color:#1c1c1e;margin-top:6px;word-break:break-word;letter-spacing:-.5px}
+.kb-summary-sub{font-size:15px;color:rgba(0,0,0,.4);margin-top:5px}
+
+.itogo-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.it-label{font-size:14px;color:#8e8e93;text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px;font-weight:600}
+.it-val{font-size:22px;font-weight:800;word-break:break-word}
+.it-val.neg{color:#ff3b30}.it-val.pos{color:#34c759}.it-val.warn{color:#ff9500}
+
+.section-title{font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin:20px 0 12px;color:#8e8e93}
+.potok-card{background:#fff;border-radius:16px;padding:18px 16px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.05);cursor:pointer}
+.potok-card:active{transform:scale(.98)}
+.potok-card.closed-card{background:#f0f0f0;opacity:.6}
+.potok-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;gap:8px}
+.potok-name{font-size:20px;font-weight:800;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.potok-badge{font-size:12px;font-weight:700;background:#34c759;color:#fff;padding:4px 10px;border-radius:8px;text-transform:uppercase;flex-shrink:0}
+.closed-card .potok-badge{background:#8e8e93}
+.potok-date{font-size:14px;color:#8e8e93;margin-bottom:10px}
+.potok-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.potok-ml{font-size:12px;color:#8e8e93;text-transform:uppercase;margin-bottom:3px;font-weight:600}
+.potok-mv{font-size:18px;font-weight:800;word-break:break-word}
+.potok-mv.g{color:#34c759}.potok-mv.r{color:#ff3b30}
+.potok-report{margin-top:8px;font-size:15px;color:#ff9500;font-weight:700}
+
+/* Модалка */
+.modal-bg{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;padding:16px}
+.modal-bg.show{display:flex}
+.modal{background:#fff;border-radius:22px;padding:26px 22px;width:100%;max-width:460px;animation:popIn .3s ease both;max-height:90vh;overflow-y:auto}
+.modal h3{font-size:24px;font-weight:800;margin-bottom:20px}
+.modal .field{margin-bottom:18px}
+.modal-btns{display:flex;gap:10px;margin-top:20px}
+.modal-btns button{flex:1;padding:18px;font-size:17px;font-weight:700;border:none;border-radius:14px;cursor:pointer;font-family:inherit}
+.modal-ok{background:#007aff;color:#fff}
+.modal-cancel{background:#e5e5ea;color:#1c1c1e}
+.modal-bigamt{display:block;width:100%;padding:18px;font-size:28px;font-weight:800;border:2px solid #e5e5ea;border-radius:14px;background:#fff;font-family:inherit;outline:none;text-align:center;-webkit-appearance:none}
+
+/* Редактор справочников */
+.ref-list{list-style:none;padding:0;margin:0 0 16px}
+.ref-item{display:flex;align-items:center;gap:10px;padding:14px 16px;background:#f9f9f9;border-radius:14px;margin-bottom:8px}
+.ref-item-name{flex:1;font-size:18px;font-weight:500;word-break:break-word;min-width:0}
+.ref-item-del{background:#ff3b30;color:#fff;border:none;border-radius:10px;width:40px;height:40px;font-size:22px;cursor:pointer;flex-shrink:0;font-family:inherit}
+.ref-item-del:active{opacity:.7}
+.ref-add-row{display:flex;gap:8px}
+.ref-add-row input{flex:1;padding:16px;font-size:19px;border:2px solid #e5e5ea;border-radius:14px;font-family:inherit;outline:none;-webkit-appearance:none}
+.ref-add-row button{padding:0 22px;background:#34c759;color:#fff;border:none;border-radius:14px;font-size:22px;font-weight:800;cursor:pointer;font-family:inherit;min-width:56px}
+
+/* Детализация объекта */
+.proj-stat{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px}
+.proj-stat-item{text-align:center;padding:14px 6px;background:#fff;border-radius:14px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.proj-stat-label{font-size:12px;color:#8e8e93;text-transform:uppercase;margin-bottom:4px;font-weight:600}
+.proj-stat-val{font-size:18px;font-weight:800;word-break:break-word}
+
+.op-card{background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.op-card-head{display:flex;justify-content:space-between;align-items:center;gap:10px;cursor:pointer}
+.op-card-left{flex:1;min-width:0}
+.op-card-date{font-size:13px;color:#8e8e93}
+.op-card-article{font-size:17px;font-weight:700;word-break:break-word;margin:2px 0}
+.op-card-sub{font-size:14px;color:#8e8e93;word-break:break-word}
+.op-card-amt{font-size:19px;font-weight:800;flex-shrink:0;word-break:break-word;text-align:right}
+.op-card-amt.g{color:#34c759}.op-card-amt.r{color:#ff3b30}
+
+.op-edit-panel{display:none;padding:14px 0 0;border-top:1px solid #e5e5ea;margin-top:12px}
+.op-edit-panel.show{display:block}
+.op-edit-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.op-edit-row.full{grid-template-columns:1fr}
+.op-edit-row label{font-size:12px;color:#8e8e93;text-transform:uppercase;display:block;margin-bottom:4px;font-weight:600}
+.op-edit-row input,.op-edit-row select{width:100%;padding:12px 14px;font-size:17px;border:2px solid #e5e5ea;border-radius:10px;background:#fff;font-family:inherit;outline:none;-webkit-appearance:none}
+.op-edit-btns{display:flex;gap:8px;margin-top:12px}
+.op-edit-btns button{flex:1;padding:14px;font-size:15px;font-weight:700;border:none;border-radius:12px;cursor:pointer;font-family:inherit}
+.op-btn-save{background:#007aff;color:#fff}
+.op-btn-del{background:#ff3b30;color:#fff}
+.op-btn-cancel{background:#e5e5ea;color:#1c1c1e}
+
+.proj-add-btn{width:100%;padding:20px;font-size:19px;font-weight:800;background:#007aff;color:#fff;border:none;border-radius:14px;cursor:pointer;font-family:inherit;margin-top:14px;box-shadow:0 4px 16px rgba(0,122,255,.3)}
+.proj-add-btn:active{transform:scale(.97)}
+.proj-close-btn{width:100%;padding:16px;font-size:16px;font-weight:700;border:2px solid #e5e5ea;border-radius:14px;background:#fff;color:#8e8e93;cursor:pointer;font-family:inherit;margin-top:10px}
+.proj-close-btn.is-closed{border-color:#34c759;color:#34c759;background:#f0fff4}
+
+.loading{text-align:center;color:#8e8e93;padding:20px 0;font-size:17px}
+.confetti-container{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;overflow:hidden}
+.confetti-piece{position:absolute;width:10px;height:10px;top:-10px;border-radius:2px;animation:confettiFall 2.5s ease-out forwards}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ===== PWA INSTALL BANNER ===== -->
+<div class="install-prompt" id="installPrompt" style="display:none">
+  <button class="install-close" onclick="dismissInstall()">×</button>
+  <b>📱 Установи на экран «Домой»</b>
+  Будет работать как отдельное приложение — без Safari и без баннеров Google.
+  <div class="install-prompt-steps">
+    <span>1. Нажми</span> <span>⎋ Поделиться</span> <span>2. «На экран Домой»</span> <span>3. «Добавить»</span>
+  </div>
+</div>
+
+<!-- ===== ДАШБОРД ===== -->
+<div class="card-dark">
+  <div class="dash-top">
+    <div class="dash-main">
+      <div class="bal-label">Баланс</div>
+      <div class="bal-total" id="balTotal">...</div>
+      <div class="bal-updated" id="balUpdated">...</div>
+    </div>
+    <div class="kubushka kubushka-zero" id="kubushka">
+      <div class="kb-label">Кубышка</div>
+      <div class="kb-val" id="kbVal">0 ₽</div>
+    </div>
+  </div>
+  <div class="wallets" id="wallets"></div>
+  <div class="tags-title">Последние</div>
+  <div class="tags-cloud" id="lastOps"></div>
+  <div class="dash-actions">
+    <button class="dash-btn btn-summary" onclick="openSummary()">Сводка</button>
+    <button class="dash-btn btn-balance" onclick="openBalanceModal()">Остаток</button>
+    <button class="dash-btn btn-refs" onclick="openRefsModal()">Потоки</button>
+  </div>
+</div>
+
+<!-- ===== ФОРМА ===== -->
+<div class="card" style="animation-delay:.05s">
+  <div class="form-header">
+    <div class="who-tag" id="whoBadge">—</div>
+    <input class="date-input" id="дата" type="date">
+  </div>
+  <div class="status-row">
+    <label class="chk"><input type="checkbox" id="chkDraft"><span>Черновик</span></label>
+    <label class="chk"><input type="checkbox" id="chkReport"><span>Под отчёт</span></label>
+  </div>
+  <div id="notice"></div>
+  <form id="F" onsubmit="sendForm(event)">
+    <div class="type-row">
+      <button type="button" class="type-btn" id="btnIncome" onclick="pickType('Доход')">Доход</button>
+      <button type="button" class="type-btn" id="btnExpense" onclick="pickType('Расход')">Расход</button>
+    </div>
+    <div class="field"><div class="field-label">Объект / поток</div><select id="поток"><option value="">Выбрать</option></select></div>
+    <div class="field"><div class="field-label">Статья</div><select id="статья"><option value="">Выбрать</option></select></div>
+    <div class="field">
+      <div class="field-label">Контрагент</div>
+      <div class="ct-wrap">
+        <input id="контрагент" type="text" placeholder="начни вводить..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" oninput="ctFilter(this.value)" onfocus="ctFilter(this.value)" onblur="setTimeout(ctHide,250)">
+        <div class="ct-drop" id="ctDrop"></div>
+      </div>
+    </div>
+    <div class="sum-block">
+      <input class="sum-input" id="сумма" type="text" inputmode="decimal" placeholder="0" oninput="validateSum(this)">
+      <div class="sum-cur">руб. (копейки через запятую)</div>
+    </div>
+    <div class="pay-label">Способ оплаты</div>
+    <div class="pay-row" id="payRow"></div>
+    <div class="pay-label">Контур денег</div>
+    <div class="cnt-row" id="cntRow"></div>
+    <div class="field"><div class="field-label">Комментарий</div><textarea id="комментарий" placeholder="необязательно"></textarea></div>
+    <input type="hidden" id="кто" value="">
+    <button class="btn-submit" type="submit" id="submitBtn">Добавить</button>
+  </form>
+</div>
+</div>
+
+<!-- ===== МОДАЛКА ОСТАТКА ===== -->
+<div class="modal-bg" id="balModal">
+  <div class="modal">
+    <h3>Задать остаток</h3>
+    <div class="field"><div class="field-label">Контур</div><select id="balContour"><option value="">Выбрать</option></select></div>
+    <div class="field"><div class="field-label">Реальная сумма</div><input id="balAmount" type="text" inputmode="decimal" placeholder="0" class="modal-bigamt" oninput="validateSum(this)"></div>
+    <div id="balNotice"></div>
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeBalanceModal()">Отмена</button>
+      <button class="modal-ok" onclick="doSetBalance()">Сровнять</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== МОДАЛКА СПРАВОЧНИКА ПОТОКОВ ===== -->
+<div class="modal-bg" id="refsModal">
+  <div class="modal">
+    <h3>Потоки / Объекты</h3>
+    <ul class="ref-list" id="refList"></ul>
+    <div class="ref-add-row">
+      <input id="refNew" type="text" placeholder="Новый поток" autocomplete="off">
+      <button onclick="addNewStream()">+</button>
+    </div>
+    <div id="refNotice" style="margin-top:10px"></div>
+    <div class="modal-btns" style="margin-top:10px">
+      <button class="modal-cancel" onclick="closeRefsModal()" style="flex:1">Закрыть</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== СВОДКА ===== -->
+<div class="overlay" id="summaryScreen">
+  <div class="wrap">
+    <div class="ov-header"><button class="ov-back" onclick="closeSummary()">Назад</button><div class="ov-title">Сводка</div></div>
+    <div id="kbSummaryBlock"></div>
+    <div class="card" id="summaryTotal"><div class="loading">Загрузка...</div></div>
+    <div id="summaryRows"></div>
+  </div>
+</div>
+
+<!-- ===== ДЕТАЛИЗАЦИЯ ОБЪЕКТА ===== -->
+<div class="overlay" id="projScreen">
+  <div class="wrap">
+    <div class="ov-header"><button class="ov-back" onclick="closeProject()">Назад</button><div class="ov-title" id="projTitle">Объект</div></div>
+    <div id="projStat"></div>
+    <div id="projOps"><div class="loading">Загрузка...</div></div>
+    <button class="proj-add-btn" onclick="addToProjForm()">+ Добавить операцию</button>
+    <button class="proj-close-btn" id="projCloseBtn" onclick="toggleProjClose()">Закрыть объект</button>
+  </div>
+</div>
+
+<div class="confetti-container" id="confettiBox"></div>
+
+<script>
+/* ============================================
+   КОНФИГ: впиши сюда URL GAS Web App (заканчивается на /exec)
+   Получить: GAS → Deploy → New deployment → URL
+   ============================================ */
+var GAS_URL = 'ВСТАВЬ_СЮДА_URL_GAS_ЗАКАНЧИВАЮЩИЙСЯ_НА_EXEC';
+
+/* Кто зашёл — определяется по параметру ?who=maxim / ?who=arina в URL */
+var _urlParams = new URLSearchParams(location.search);
+var _whoFromUrl = _urlParams.get('who') || '';
+
+/* === API HELPER: fetch → GAS ============================================ */
+var READ_ACTIONS = {getBalances:1,getOptions:1,getContragents:1,getSummary:1,getStreams:1,getProjectOps:1};
+
+function api(action, data){
+  // GET для чтения, POST для изменений
+  if (READ_ACTIONS[action]) {
+    var qs = '?action=' + encodeURIComponent(action);
+    if (data && typeof data === 'object') {
+      Object.keys(data).forEach(function(k){ qs += '&' + k + '=' + encodeURIComponent(data[k]); });
+    }
+    return fetch(GAS_URL + qs).then(function(r){ return r.json(); });
+  } else {
+    return fetch(GAS_URL, {
+      method: 'POST',
+      body: JSON.stringify({action: action, data: data || {}}),
+      headers: {'Content-Type': 'text/plain;charset=utf-8'},
+      redirect: 'follow'
+    }).then(function(r){ return r.json(); });
+  }
+}
+
+// Совместимость с google.script.run (когда HTML открыт из GAS)
+var USE_GAS_RUN = (typeof google !== 'undefined' && google.script && google.script.run) && GAS_URL.indexOf('ВСТАВЬ') !== -1;
+
+function call(action, data, onSuccess, onFailure){
+  if (USE_GAS_RUN) {
+    var runner = google.script.run
+      .withSuccessHandler(onSuccess || function(){})
+      .withFailureHandler(onFailure || function(){});
+    switch(action){
+      case 'getBalances':     return runner.getBalances();
+      case 'getOptions':      return runner.getOptions();
+      case 'getContragents':  return runner.getContragents();
+      case 'getSummary':      return runner.getSummary();
+      case 'getStreams':      return runner.getStreams();
+      case 'getProjectOps':   return runner.getProjectOps(data.projectName || data.name);
+      case 'submitOperation': return runner.submitOperation(data);
+      case 'setBalance':      return runner.setBalance(data.contour, data.amount);
+      case 'toggleProject':   return runner.toggleProject(data.name);
+      case 'addStream':       return runner.addStream(data.name);
+      case 'removeStream':    return runner.removeStream(data.name);
+      case 'updateOperation': return runner.updateOperation(data.rowNum, data.data);
+      case 'deleteOperation': return runner.deleteOperation(data.rowNum);
+    }
+    return;
+  }
+  api(action, data).then(onSuccess || function(){}).catch(onFailure || function(){});
+}
+
+/* === ГЛОБАЛЫ === */
+var selectedType='',selectedPay='',selectedContour='',currentWho='',ctList=[];
+var articlesIncome=[],articlesExpense=[],allOptions={};
+var currentProject='',summaryData=null;
+
+/* === CONFETTI === */
+function fireConfetti(){var b=document.getElementById('confettiBox');var colors=['#ffd700','#ff3b30','#34c759','#007aff','#ff9500','#af52de'];for(var i=0;i<40;i++){var p=document.createElement('div');p.className='confetti-piece';p.style.left=Math.random()*100+'%';p.style.background=colors[Math.floor(Math.random()*colors.length)];p.style.animationDelay=Math.random()+'s';p.style.animationDuration=(2+Math.random()*1.5)+'s';p.style.width=(6+Math.random()*8)+'px';p.style.height=(6+Math.random()*8)+'px';b.appendChild(p)}setTimeout(function(){b.innerHTML=''},4000)}
+
+/* === УТИЛИТЫ === */
+// Форматирование с копейками через запятую: 835738.78 → "835 738,78 ₽"
+function fmt(n){
+  if(n==null||isNaN(n))return'—';
+  var sign=n<0?'−':'';
+  var abs=Math.abs(n);
+  var rounded=Math.round(abs*100)/100;
+  var hasCents=Math.abs(rounded-Math.round(rounded))>0.001;
+  var intPart=Math.floor(rounded);
+  var formatted=intPart.toLocaleString('ru-RU');
+  if(hasCents){
+    var cents=Math.round((rounded-intPart)*100);
+    if(cents<10)cents='0'+cents;
+    formatted+=','+cents;
+  }
+  return sign+formatted+' ₽';
+}
+
+// Парсинг строки "1 500,50" или "1500.50" → число 1500.5
+function parseNum(v){
+  if(typeof v==='number')return v;
+  if(!v&&v!==0)return 0;
+  var s=String(v).replace(/\s/g,'').replace(/,/g,'.');
+  var parts=s.split('.');
+  if(parts.length>2)s=parts.slice(0,-1).join('')+'.'+parts[parts.length-1];
+  return parseFloat(s)||0;
+}
+
+// Разрешаем в поле суммы только цифры + одна запятая/точка
+function validateSum(el){
+  var v=el.value.replace(/[^\d.,]/g,'').replace(/\./g,',');
+  // Оставить только одну запятую
+  var parts=v.split(',');
+  if(parts.length>2)v=parts[0]+','+parts.slice(1).join('');
+  // Максимум 2 знака после запятой
+  if(parts.length===2&&parts[1].length>2)v=parts[0]+','+parts[1].substring(0,2);
+  el.value=v;
+}
+
+function countUp(el,target,dur){var t0=null;function step(ts){if(!t0)t0=ts;var p=Math.min((ts-t0)/dur,1);el.textContent=fmt(target*Math.pow(p,0.5));if(p<1)requestAnimationFrame(step)}requestAnimationFrame(step)}
+
+function setDate(){document.getElementById('дата').value=new Date().toISOString().split('T')[0]}
+function fillSelect(id,list){var el=document.getElementById(id);if(!el)return;el.innerHTML='<option value="">Выбрать</option>';(list||[]).forEach(function(v){var o=document.createElement('option');o.value=v;o.textContent=v;el.appendChild(o)})}
+function showNotice(t,txt){document.getElementById('notice').innerHTML=txt?'<div class="notice '+t+'">'+txt+'</div>':''}
+
+/* === ТИП === */
+function pickType(t){selectedType=t;document.getElementById('btnIncome').className='type-btn'+(t==='Доход'?' on-income':'');document.getElementById('btnExpense').className='type-btn'+(t==='Расход'?' on-expense':'');updateArticles()}
+function updateArticles(){fillSelect('статья',selectedType==='Доход'?articlesIncome:selectedType==='Расход'?articlesExpense:[])}
+
+/* === СПОСОБ ОПЛАТЫ — иконки по ключевым словам === */
+function payIcon(name){
+  var n=name.toLowerCase();
+  if(n.indexOf('налич')!==-1)return'💵';
+  if(n.indexOf('счет')!==-1||n.indexOf('счёт')!==-1||n.indexOf('ип')!==-1)return'🏢';
+  if(n.indexOf('карт')!==-1)return'💳';
+  if(n.indexOf('перевод')!==-1)return'💸';
+  return'💰';
+}
+function buildPayButtons(list){
+  var r=document.getElementById('payRow');r.innerHTML='';
+  (list||[]).forEach(function(v){
+    var b=document.createElement('button');b.type='button';b.className='pay-btn';b.setAttribute('data-pay',v);
+    b.innerHTML='<span class="pay-icon">'+payIcon(v)+'</span><span class="pay-text">'+v+'</span>';
+    b.onclick=function(){pickPay(v)};
+    r.appendChild(b);
+  });
+}
+function pickPay(v){selectedPay=v;var bs=document.querySelectorAll('.pay-btn');for(var i=0;i<bs.length;i++)bs[i].className='pay-btn'+(bs[i].getAttribute('data-pay')===v?' on':'')}
+
+/* === КОНТУР ДЕНЕГ — кнопки с иконками === */
+function contourIcon(name){
+  var n=name.toLowerCase();
+  if(n.indexOf('арин')!==-1)return'💗';
+  if(n.indexOf('максим')!==-1)return'💙';
+  if(n.indexOf('ип')!==-1||n.indexOf('счет')!==-1||n.indexOf('счёт')!==-1)return'🏦';
+  if(n.indexOf('касс')!==-1)return'🏠';
+  if(n.indexOf('налич')!==-1)return'💵';
+  if(n.indexOf('карт')!==-1)return'💳';
+  return'💼';
+}
+function buildContourButtons(list){
+  var r=document.getElementById('cntRow');r.innerHTML='';
+  (list||[]).forEach(function(v){
+    var b=document.createElement('button');b.type='button';b.className='cnt-btn';b.setAttribute('data-cnt',v);
+    b.innerHTML='<span class="cnt-icon">'+contourIcon(v)+'</span><span class="cnt-text">'+v+'</span>';
+    b.onclick=function(){pickContour(v)};
+    r.appendChild(b);
+  });
+}
+function pickContour(v){selectedContour=v;var bs=document.querySelectorAll('.cnt-btn');for(var i=0;i<bs.length;i++)bs[i].className='cnt-btn'+(bs[i].getAttribute('data-cnt')===v?' on':'')}
+
+/* === КТО === */
+function initWho(){
+  var raw = _whoFromUrl || (typeof GAS_WHO !== 'undefined' ? GAS_WHO : '');
+  var m={'maxim':'Максим','arina':'Арина'};
+  currentWho=m[raw.toLowerCase()]||'';
+  document.getElementById('кто').value=currentWho;
+  document.getElementById('whoBadge').textContent=currentWho||'—';
+}
+
+/* === КОНТРАГЕНТ === */
+function ctFilter(val){var dd=document.getElementById('ctDrop');var f=val.length<1?ctList:ctList.filter(function(v){return v.toLowerCase().indexOf(val.toLowerCase())!==-1});if(!f.length){dd.style.display='none';return}dd.innerHTML=f.map(function(v){return'<div class="ct-item" onclick="ctPick(\''+v.replace(/'/g,"\\'")+'\')" ontouchstart="ctPick(\''+v.replace(/'/g,"\\'")+'\')">'+v+'</div>'}).join('');dd.style.display='block'}
+function ctPick(v){document.getElementById('контрагент').value=v;document.getElementById('ctDrop').style.display='none'}
+function ctHide(){document.getElementById('ctDrop').style.display='none'}
+
+/* === ОТПРАВКА === */
+function sendForm(e){
+  e.preventDefault();
+  var d={поток:document.getElementById('поток').value,статья:document.getElementById('статья').value,сумма:document.getElementById('сумма').value,контрагент:document.getElementById('контрагент').value};
+  if(!selectedType){showNotice('err','Выберите тип');return}
+  if(!d.поток){showNotice('err','Выберите поток');return}
+  if(!d.статья){showNotice('err','Выберите статью');return}
+  if(!d.контрагент){showNotice('err','Укажите контрагента');return}
+  var num=parseNum(d.сумма);
+  if(!num||num<=0){showNotice('err','Укажите сумму');return}
+  if(!selectedPay){showNotice('err','Выберите способ оплаты');return}
+  if(!selectedContour){showNotice('err','Выберите контур');return}
+  var статус='Оплачено';
+  if(document.getElementById('chkDraft').checked)статус='Черновик';
+  if(document.getElementById('chkReport').checked)статус='Под отчёт';
+  var btn=document.getElementById('submitBtn');btn.disabled=true;btn.textContent='Сохраняю...';showNotice('','');
+  call('submitOperation', {
+    дата:document.getElementById('дата').value,поток:d.поток,тип:selectedType,статья:d.статья,
+    контрагент:d.контрагент,сумма:num,статус:статус,способ:selectedPay,контур:selectedContour,
+    кто:currentWho,комментарий:document.getElementById('комментарий').value
+  }, function(r){
+    btn.disabled=false;
+    if(r.success){btn.textContent='Готово!';btn.classList.add('success','anim-pulse');showNotice('ok',r.message);setTimeout(function(){btn.textContent='Добавить';btn.classList.remove('success','anim-pulse')},1500);resetForm();loadBalances()}
+    else{btn.textContent='Ошибка';btn.classList.add('error','anim-shake');showNotice('err',r.error||'Ошибка');setTimeout(function(){btn.textContent='Добавить';btn.classList.remove('error','anim-shake')},1500)}
+  }, function(err){btn.disabled=false;btn.textContent='Добавить';showNotice('err',(err&&err.message)||'Сеть');});
+}
+function resetForm(){
+  document.getElementById('F').reset();setDate();document.getElementById('кто').value=currentWho;
+  selectedType='';selectedPay='';selectedContour='';
+  document.getElementById('btnIncome').className='type-btn';
+  document.getElementById('btnExpense').className='type-btn';
+  document.querySelectorAll('.pay-btn').forEach(function(b){b.className='pay-btn'});
+  document.querySelectorAll('.cnt-btn').forEach(function(b){b.className='cnt-btn'});
+  fillSelect('статья',[]);
+}
+
+/* === БАЛАНС === */
+function loadBalances(){
+  call('getBalances', {}, function(b){
+    var el=document.getElementById('balTotal');el.className='bal-total'+((b.total||0)<0?' neg':'');countUp(el,b.total||0,800);
+    document.getElementById('balUpdated').textContent='обновлено '+(b.updated||'—');
+    var kb=b.kubushka||0;var kbBox=document.getElementById('kubushka');document.getElementById('kbVal').textContent=fmt(kb);
+    kbBox.className=kb?'kubushka':'kubushka kubushka-zero';
+    document.getElementById('wallets').innerHTML=(b.accounts||[]).map(function(a,i){return'<div class="w-item" style="animation:fadeUp .4s ease '+(i*.06)+'s both"><div class="w-name">'+a.name+'</div><div class="w-amt'+(a.amount<0?' neg':'')+'">'+fmt(a.amount)+'</div></div>'}).join('');
+    var oEl=document.getElementById('lastOps');
+    if(b.lastOps&&b.lastOps.length){
+      oEl.innerHTML=b.lastOps.map(function(op){var inc=op.тип==='Доход'||op.тип==='Начальный остаток';return'<div class="tag '+(inc?'tag-inc':'tag-exp')+'">'+(inc?'+':'−')+fmt(op.сумма)+'<span class="tag-sub">'+op.поток+'</span></div>'}).join('');
+    }else{oEl.innerHTML='<span style="color:rgba(255,255,255,.3);font-size:11px">Нет операций</span>'}
+  }, function(){document.getElementById('balTotal').textContent='—'});
+}
+
+/* === СПРАВОЧНИКИ === */
+function loadOptions(){
+  call('getOptions', {}, function(opts){
+    allOptions=opts;
+    fillSelect('поток',opts['поток']||[]);
+    articlesIncome=opts['статьиДоходы']||[];articlesExpense=opts['статьиРасходы']||[];
+    buildPayButtons(opts['способ']||['Перевод','Наличными','Оплата по счету ИП','Оплата картой']);
+    buildContourButtons(opts['контур']||[]);
+    var ctRef=opts['контрагент']||[];
+    call('getContragents', {}, function(ctData){
+      var merged=ctRef.slice();var seen={};merged.forEach(function(v){seen[v]=true});
+      (ctData||[]).forEach(function(v){if(!seen[v]){merged.push(v);seen[v]=true}});
+      ctList=merged.sort();
+    }, function(){ctList=ctRef});
+  });
+}
+
+/* === МОДАЛКА ОСТАТКА === */
+function openBalanceModal(){
+  document.getElementById('balModal').classList.add('show');
+  var sel=document.getElementById('balContour');sel.innerHTML='<option value="">Выбрать</option>';
+  (allOptions['контур']||[]).forEach(function(v){var o=document.createElement('option');o.value=v;o.textContent=v;sel.appendChild(o)});
+  document.getElementById('balAmount').value='';document.getElementById('balNotice').innerHTML='';
+}
+function closeBalanceModal(){document.getElementById('balModal').classList.remove('show')}
+function doSetBalance(){
+  var k=document.getElementById('balContour').value;var a=document.getElementById('balAmount').value;
+  if(!k){document.getElementById('balNotice').innerHTML='<div class="notice err">Выберите контур</div>';return}
+  if(!a&&a!=='0'){document.getElementById('balNotice').innerHTML='<div class="notice err">Введите сумму</div>';return}
+  var num=parseNum(a);
+  document.getElementById('balNotice').innerHTML='<div class="loading">Считаю...</div>';
+  call('setBalance', {contour:k, amount:num}, function(r){
+    if(r.success){document.getElementById('balNotice').innerHTML='<div class="notice ok">'+r.message+'</div>';loadBalances();setTimeout(closeBalanceModal,1500)}
+    else{document.getElementById('balNotice').innerHTML='<div class="notice err">'+r.error+'</div>'}
+  }, function(e){document.getElementById('balNotice').innerHTML='<div class="notice err">'+((e&&e.message)||'Сеть')+'</div>'});
+}
+
+/* === МОДАЛКА ПОТОКОВ === */
+function openRefsModal(){
+  document.getElementById('refsModal').classList.add('show');
+  document.getElementById('refNotice').innerHTML='';
+  document.getElementById('refNew').value='';
+  loadStreams();
+}
+function closeRefsModal(){document.getElementById('refsModal').classList.remove('show')}
+function loadStreams(){
+  document.getElementById('refList').innerHTML='<li style="color:#8e8e93;font-size:13px;padding:8px">Загрузка...</li>';
+  call('getStreams', {}, function(list){
+    renderStreams(list||[]);
+  }, function(e){
+    document.getElementById('refList').innerHTML='<li style="color:#ff3b30;font-size:13px;padding:8px">'+((e&&e.message)||'Ошибка')+'</li>';
+  });
+}
+function renderStreams(list){
+  if(!list.length){document.getElementById('refList').innerHTML='<li style="color:#8e8e93;font-size:13px;padding:8px">Пусто</li>';return}
+  document.getElementById('refList').innerHTML=list.map(function(v){
+    var esc=v.replace(/'/g,"\\'");
+    return'<li class="ref-item"><span class="ref-item-name">'+v+'</span><button class="ref-item-del" onclick="delStream(\''+esc+'\')">×</button></li>';
+  }).join('');
+}
+function addNewStream(){
+  var v=document.getElementById('refNew').value.trim();
+  if(!v){document.getElementById('refNotice').innerHTML='<div class="notice err">Введите имя</div>';return}
+  document.getElementById('refNotice').innerHTML='<div class="loading">Добавляю...</div>';
+  call('addStream', {name:v}, function(r){
+    if(r.success){
+      document.getElementById('refNotice').innerHTML='<div class="notice ok">Добавлено</div>';
+      document.getElementById('refNew').value='';
+      renderStreams(r.streams||[]);
+      var cur=document.getElementById('поток').value;
+      fillSelect('поток',r.streams||[]);
+      if(cur)document.getElementById('поток').value=cur;
+      setTimeout(function(){document.getElementById('refNotice').innerHTML=''},1500);
+    }else{
+      document.getElementById('refNotice').innerHTML='<div class="notice err">'+r.error+'</div>';
+    }
+  }, function(e){document.getElementById('refNotice').innerHTML='<div class="notice err">'+((e&&e.message)||'Сеть')+'</div>'});
+}
+function delStream(name){
+  if(!confirm('Удалить поток «'+name+'» из справочника?\nСуществующие операции с этим потоком останутся.'))return;
+  document.getElementById('refNotice').innerHTML='<div class="loading">Удаляю...</div>';
+  call('removeStream', {name:name}, function(r){
+    if(r.success){
+      document.getElementById('refNotice').innerHTML='<div class="notice ok">Удалено</div>';
+      renderStreams(r.streams||[]);
+      fillSelect('поток',r.streams||[]);
+      setTimeout(function(){document.getElementById('refNotice').innerHTML=''},1500);
+    }else{
+      document.getElementById('refNotice').innerHTML='<div class="notice err">'+r.error+'</div>';
+    }
+  }, function(e){document.getElementById('refNotice').innerHTML='<div class="notice err">'+((e&&e.message)||'Сеть')+'</div>'});
+}
+
+/* === СВОДКА === */
+function openSummary(){document.getElementById('summaryScreen').style.display='block';document.body.style.overflow='hidden';loadSummary()}
+function closeSummary(){document.getElementById('summaryScreen').style.display='none';document.body.style.overflow=''}
+function loadSummary(){
+  document.getElementById('summaryTotal').innerHTML='<div class="loading">Загрузка...</div>';
+  document.getElementById('summaryRows').innerHTML='';document.getElementById('kbSummaryBlock').innerHTML='';
+  call('getSummary', {}, function(data){
+    summaryData=data;var it=data.итого||{};var cl=data.closed||[];
+    var kbT=0;(data.rows||[]).forEach(function(r){if(r.закрыт)kbT+=r.чистая});
+    if(kbT)document.getElementById('kbSummaryBlock').innerHTML='<div class="kb-summary"><div class="kb-summary-label">Кубышка</div><div class="kb-summary-val">'+fmt(kbT)+'</div><div class="kb-summary-sub">'+cl.length+' объект(ов) сдано</div></div>';
+    document.getElementById('summaryTotal').innerHTML='<div style="font-size:10px;font-weight:700;color:#8e8e93;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">Итого</div><div class="itogo-grid"><div><div class="it-label">Пришло</div><div class="it-val pos">'+fmt(it.пришло)+'</div></div><div><div class="it-label">Ушло</div><div class="it-val neg">'+fmt(it.ушло)+'</div></div><div><div class="it-label">Под отчёт</div><div class="it-val warn">'+fmt(it.подотчет)+'</div></div><div><div class="it-label">Чистая</div><div class="it-val '+(it.чистая>=0?'pos':'neg')+'">'+fmt(it.чистая)+'</div></div></div>';
+    var active=[],closed=[];
+    (data.rows||[]).forEach(function(r){if(!r.пришло&&!r.ушло&&!r.подотчет)return;(r.закрыт?closed:active).push(r)});
+    var h='';
+    if(active.length){h+='<div class="section-title">Активные</div>';active.forEach(function(r,i){h+=potokHTML(r,i)})}
+    if(closed.length){h+='<div class="section-title">Закрытые</div>';closed.forEach(function(r,i){h+=potokHTML(r,i)})}
+    document.getElementById('summaryRows').innerHTML=h;
+  }, function(e){document.getElementById('summaryTotal').innerHTML='<div style="color:#ff3b30">'+((e&&e.message)||'Сеть')+'</div>'});
+}
+function potokHTML(r,i){
+  return'<div class="potok-card'+(r.закрыт?' closed-card':'')+'" style="animation:fadeUp .4s ease '+(i*.05)+'s both" onclick="openProject(\''+r.поток.replace(/'/g,"\\'")+'\')">'
+    +'<div class="potok-head"><div class="potok-name">'+r.поток+'</div>'+(r.закрыт?'<div class="potok-badge">Сдан</div>':'')+'</div>'
+    +'<div class="potok-date">'+r.последняя+'</div>'
+    +'<div class="potok-grid"><div><div class="potok-ml">Пришло</div><div class="potok-mv g">'+fmt(r.пришло)+'</div></div><div><div class="potok-ml">Ушло</div><div class="potok-mv r">'+fmt(r.ушло)+'</div></div><div><div class="potok-ml">Чистая</div><div class="potok-mv '+(r.чистая>=0?'g':'r')+'">'+fmt(r.чистая)+'</div></div></div>'
+    +(r.подотчет?'<div class="potok-report">Под отчёт: '+fmt(r.подотчет)+'</div>':'')
+    +'</div>';
+}
+
+/* === ДЕТАЛИЗАЦИЯ === */
+function openProject(name){
+  currentProject=name;
+  document.getElementById('projScreen').style.display='block';
+  document.getElementById('projTitle').textContent=name;
+  var info=null;
+  if(summaryData)(summaryData.rows||[]).forEach(function(r){if(r.поток===name)info=r});
+  if(info){
+    document.getElementById('projStat').innerHTML='<div class="proj-stat"><div class="proj-stat-item"><div class="proj-stat-label">Пришло</div><div class="proj-stat-val" style="color:#34c759">'+fmt(info.пришло)+'</div></div><div class="proj-stat-item"><div class="proj-stat-label">Ушло</div><div class="proj-stat-val" style="color:#ff3b30">'+fmt(info.ушло)+'</div></div><div class="proj-stat-item"><div class="proj-stat-label">Чистая</div><div class="proj-stat-val" style="color:'+(info.чистая>=0?'#34c759':'#ff3b30')+'">'+fmt(info.чистая)+'</div></div></div>';
+    var cb=document.getElementById('projCloseBtn');cb.className='proj-close-btn'+(info.закрыт?' is-closed':'');cb.textContent=info.закрыт?'Открыть объект':'Закрыть → в кубышку';
+  }
+  loadProjectOps(name);
+}
+function closeProject(){document.getElementById('projScreen').style.display='none';currentProject=''}
+function loadProjectOps(name){
+  document.getElementById('projOps').innerHTML='<div class="loading">Загрузка...</div>';
+  call('getProjectOps', {name:name, projectName:name}, function(ops){
+    if(!ops||!ops.length){document.getElementById('projOps').innerHTML='<div class="loading">Нет операций</div>';return}
+    document.getElementById('projOps').innerHTML=ops.map(function(op){
+      var inc=op.тип==='Доход'||op.тип==='Начальный остаток';
+      return'<div class="op-card" id="opc_'+op.rowNum+'">'
+        +'<div class="op-card-head" onclick="toggleEdit('+op.rowNum+')">'
+        +'<div class="op-card-left"><div class="op-card-date">'+op.дата+' · '+op.тип+'</div><div class="op-card-article">'+op.статья+'</div><div class="op-card-sub">'+op.контрагент+(op.комментарий?' — '+op.комментарий:'')+'</div></div>'
+        +'<div class="op-card-amt '+(inc?'g':'r')+'">'+(inc?'+':'−')+fmt(op.сумма)+'</div></div>'
+        +'<div class="op-edit-panel" id="edit_'+op.rowNum+'">'
+        +'<div class="op-edit-row"><div><label>Дата</label><input type="date" id="ed_d_'+op.rowNum+'" value="'+op.дата+'"></div><div><label>Тип</label><select id="ed_t_'+op.rowNum+'"><option'+(op.тип==='Доход'?' selected':'')+'>Доход</option><option'+(op.тип==='Расход'?' selected':'')+'>Расход</option></select></div></div>'
+        +'<div class="op-edit-row"><div><label>Статья</label><input type="text" id="ed_s_'+op.rowNum+'" value="'+op.статья+'"></div><div><label>Контрагент</label><input type="text" id="ed_c_'+op.rowNum+'" value="'+op.контрагент+'"></div></div>'
+        +'<div class="op-edit-row"><div><label>Сумма</label><input type="text" inputmode="decimal" id="ed_a_'+op.rowNum+'" value="'+String(op.сумма).replace('.',',')+'" oninput="validateSum(this)"></div><div><label>Контур</label><input type="text" id="ed_k_'+op.rowNum+'" value="'+op.контур+'"></div></div>'
+        +'<div class="op-edit-row full"><div><label>Комментарий</label><input type="text" id="ed_m_'+op.rowNum+'" value="'+(op.комментарий||'').replace(/"/g,'&quot;')+'"></div></div>'
+        +'<div class="op-edit-btns"><button class="op-btn-save" onclick="saveOp('+op.rowNum+')">Сохранить</button><button class="op-btn-del" onclick="delOp('+op.rowNum+')">Удалить</button><button class="op-btn-cancel" onclick="toggleEdit('+op.rowNum+')">Отмена</button></div>'
+        +'</div></div>';
+    }).join('');
+  }, function(){document.getElementById('projOps').innerHTML='<div class="loading" style="color:#ff3b30">Ошибка</div>'});
+}
+function toggleEdit(rn){document.getElementById('edit_'+rn).classList.toggle('show')}
+function saveOp(rn){
+  var data={дата:document.getElementById('ed_d_'+rn).value,поток:currentProject,тип:document.getElementById('ed_t_'+rn).value,статья:document.getElementById('ed_s_'+rn).value,контрагент:document.getElementById('ed_c_'+rn).value,сумма:parseNum(document.getElementById('ed_a_'+rn).value),статус:'Оплачено',способ:'',кто:currentWho,контур:document.getElementById('ed_k_'+rn).value,комментарий:document.getElementById('ed_m_'+rn).value};
+  call('updateOperation', {rowNum:rn, data:data}, function(r){if(r.success){loadProjectOps(currentProject);loadBalances()}});
+}
+function delOp(rn){if(!confirm('Удалить эту операцию? Это нельзя отменить.'))return;call('deleteOperation', {rowNum:rn}, function(r){if(r.success){loadProjectOps(currentProject);loadBalances()}})}
+function addToProjForm(){
+  closeProject();closeSummary();
+  setTimeout(function(){
+    var sel=document.getElementById('поток');
+    for(var i=0;i<sel.options.length;i++){if(sel.options[i].value===currentProject){sel.selectedIndex=i;break}}
+    sel.scrollIntoView({behavior:'smooth'});
+  },300);
+}
+function toggleProjClose(){
+  call('toggleProject', {name:currentProject}, function(r){
+    if(r.success){if(r.closed.indexOf(currentProject)!==-1)fireConfetti();closeProject();loadSummary();loadBalances()}
+  });
+}
+
+/* === PWA INSTALL BANNER === */
+function checkStandalone(){
+  // iOS Safari: window.navigator.standalone === true когда открыто с Home Screen
+  // Другие браузеры: display-mode:standalone media query
+  var isStandalone = window.navigator.standalone === true
+    || window.matchMedia('(display-mode: standalone)').matches;
+  var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  var dismissed = false;
+  try { dismissed = localStorage.getItem('ddsInstallDismissed') === '1'; } catch(e){}
+
+  // Показать плашку только на iOS Safari в обычном режиме (не standalone)
+  if (isIOS && !isStandalone && !dismissed) {
+    document.getElementById('installPrompt').style.display = 'block';
+  }
+}
+function dismissInstall(){
+  document.getElementById('installPrompt').style.display = 'none';
+  try { localStorage.setItem('ddsInstallDismissed','1'); } catch(e){}
+}
+
+/* === INIT === */
+initWho();setDate();loadBalances();loadOptions();checkStandalone();
+</script>
+</body>
+</html>
