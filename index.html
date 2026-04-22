@@ -426,7 +426,7 @@ function api(action, data){
 }
 
 // Совместимость с google.script.run (когда HTML открыт из GAS)
-var USE_GAS_RUN = (typeof google !== 'undefined' && google.script && google.script.run) && GAS_URL.indexOf('ВСТАВЬ') !== -1;
+var USE_GAS_RUN = (typeof google !== 'undefined' && google.script && google.script.run) && GAS_URL.indexOf('https://script.google.com/macros/s/AKfycbxZ1MnyxBB5RV1szrO1qW5a4PW6VBQAZh0-Cm-4O-bdiCA17lRX1DlxOANnesm2x--x/exec') !== -1;
 
 function call(action, data, onSuccess, onFailure){
   if (USE_GAS_RUN) {
